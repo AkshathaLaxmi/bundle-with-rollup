@@ -1,5 +1,5 @@
 # Achieving Superior Code Bundling for Serverless Projects with the rollupJS approach 
-#### Coders can achieve superior code bundling with this approach
+*Coders can achieve superior code bundling with this approach*
 
 As a developer who writes many lambda functions for a project, I have encountered the issue of code organization in serverless projects. In larger serverless projects, this issue is
 magnified, as there is a large amount of code present. Without organization, the code written is neither readable nor understandable, which can lead to issues with knowledge transfers and documentation. Developers currently manage this situation by bundling code.
@@ -27,14 +27,14 @@ This has led to frustration in developers as they need to trade off certain bene
 
 Due to the cons in the existing approach, what developers need is a universal approach that can help them receive all the benefits that current approaches provide while also providing developers with the ability to have tree shaking, remain cloud agnostic, and perform local unit testing.
 
-### Bundling serverless code with rollupJS:
+## Bundling serverless code with rollupJS:
 Bundling serverless code with rollupJS offers organization of code, improved navigation, improved readability, code reusability, tree shaking, cloud agnosticism, and the ability to perform local unit testing. It also supports both es modules (by default) and commonjs modules (using the official plugin). 
 
 ES modules let you freely and seamlessly combine the most useful individual functions from your favorite libraries. This will eventually be possible natively everywhere, but Rollup lets you do it today. 
 
 To demonstrate the effectiveness of the approach, we will provide an example with code and directory structure.
 
-#### How bundling with rollupJS works?
+### How bundling with rollupJS works?
 In this example will use SAM for Infrastructure as Code and will have two tables (User and Organization) and six lambda functions (get all items for organization, get all items for the user, get organization by ID, get user by ID, put organization, and put user). The code snippets will include npm packages and a rollup config.
 
 We will use the following directory structure for the example application:
@@ -142,7 +142,7 @@ const config = [
 export default config;
 ```
 
-#### Advantages of the rollupJS approach:
+### Advantages of the rollupJS approach:
  1. Better Project organization, readability, and navigation:
 
     It is easy to differentiate code that represents handlers from the utils  Also, Typescript code is easier to read than Javascript code. Rollup can transpile typescript to javascript.
