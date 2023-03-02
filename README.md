@@ -40,27 +40,27 @@ In this example will use SAM for Infrastructure as Code and will have two tables
 We will use the following directory structure for the example application:
 
 ```
-/
-    /backend
-        /handlers
-            get-all-organizations.ts
-            get-all-users.ts
-            get-organization-by-id.ts
-            get-user-by-id.ts
-            put-organization.ts
-            put-user.ts
-        /utils
-            db.ts
-    /src
-        /handlers
-            get-all-organizations.js
-            get-all-users.js
-            get-organization-by-id.js
-            get-user-by-id.js
-            put-organization.js
-            put-user.js
-    package.json
-    rollup.config.mjs
+.
+├── backend/
+│   ├── handlers/
+│   │   ├── get-all-organizations.ts
+│   │   ├── get-all-users.ts
+│   │   ├── get-organization-by-id.ts
+│   │   ├── get-user-by-id.ts
+│   │   ├── put-organization.ts
+│   │   └── put-user.ts
+│   └── utils/
+│       └── db.ts
+├── src/
+│   └── handlers/
+│       ├── get-all-organizations.js
+│       ├── get-all-users.js
+│       ├── get-organization-by-id.js
+│       ├── get-user-by-id.js
+│       ├── put-organization.js
+│       └── put-user.js
+├── package.json
+└── rollup.config.mjs
 ```
 
 We will use the bundler to transpile the utils/db.js file into the individual functions in the functions directory.
@@ -214,7 +214,9 @@ export async function putItem(tableName: string, item: AnyObject) {
  5. Allows Tree shaking:
 
     Tree shaking can be observed when we use popular packages such as lodash. In many cases, only one or two functions are used from a relatively big package.
-    Without tree shaking, the entire package gets imported into the generated files. This leads to unnecessary bloating. As a result, the generated code ends up having 10 times the number of lines than when generated with rollup. (I will add the necessary files for the same and add a GitHub link at the end)
+    Without tree shaking, the entire package gets imported into the generated files. This leads to unnecessary bloating. As a result, the generated code ends up having 10 times the number of lines than when generated with rollup.   
+    ![Difference in file size when tree shaking is done and not done](assets/tree-shaking.png)
+
     Tree shaking, however, is not supported in Lambda Layers.
 
 
