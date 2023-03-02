@@ -1,160 +1,225 @@
-# rollup
+# Achieving Superior Code Bundling for Serverless Projects with the rollupJS approach 
+#### Coders can achieve superior code bundling with this approach
 
-This project contains source code and supporting files for a serverless application that you can deploy with the AWS Serverless Application Model (AWS SAM) command line interface (CLI). It includes the following files and folders:
+As a developer who writes many lambda functions for a project, I have encountered the issue of code organization in serverless projects. In larger serverless projects, this issue is
+magnified, as there is a large amount of code present. Without organization, the code written is neither readable nor understandable, which can lead to issues with knowledge transfers and documentation. Developers currently manage this situation by bundling code.
 
-- `src` - Code for the application's Lambda function.
-- `events` - Invocation events that you can use to invoke the function.
-- `__tests__` - Unit tests for the application code. 
-- `template.yaml` - A template that defines the application's AWS resources.
+Before jumping into the types of bundling currently used by developers, their pros and cons, and how to overcome them, let's get a little background on what bundling is and how it works.
 
-The application uses several AWS resources, including Lambda functions, an API Gateway API, and Amazon DynamoDB tables. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
+## What is bundling?
+Bundling is a common technique used in frontend stacks to resolve a large set of dependencies and package the required modules into optimized bundles for the browser to efficiently load the web application. Bundling serverless code offers excellent organization of code, improved navigation, improved readability, code reusability, tree shaking, and the ability to perform local unit testing.
 
-If you prefer to use an integrated development environment (IDE) to build and test your application, you can use the AWS Toolkit.  
-The AWS Toolkit is an open-source plugin for popular IDEs that uses the AWS SAM CLI to build and deploy serverless applications on AWS. The AWS Toolkit also adds step-through debugging for Lambda function code. 
+Bundling serverless code allows developers to group certain kinds of handlers and organize code based on functionality. This makes it easier for developers to navigate through the project and also improves readability. Additionally, bundling code of similar functionality allows developers to reuse code, which reduces the amount of code that needs to be written and maintained.
 
-To get started, see the following:
+### How does bundling work?
+Bundling works by compiling small pieces of code into something larger and more complex, such as a library or application. The process of compiling requires the bundler to use an optimization logic to serve the web pages in the least amount of time.
 
-* [CLion](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [GoLand](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [IntelliJ](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [WebStorm](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [Rider](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [PhpStorm](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [PyCharm](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [RubyMine](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [DataGrip](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [VS Code](https://docs.aws.amazon.com/toolkit-for-vscode/latest/userguide/welcome.html)
-* [Visual Studio](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/welcome.html)
+### Types of bundling currently used
+The most common type of bundling approaches currently used are SAM and Lambda Layers. Each has its advantages and disadvantages, and it's important to choose the approach that best fits the project's needs. 
 
-## Deploy the sample application
+ 1. SAM:
+For example, esbuild in SAM offers great organization of code, improved navigation, improved readability, code reusability, and [tree shaking](https://www.antstack.com/blog/nodejs-lambda-bundling-tree-shaking-webpack/), but it is not cloud/framework agnostic and does not offer official plugin support for the commonjs module format.
 
-The AWS SAM CLI is an extension of the AWS CLI that adds functionality for building and testing Lambda applications. It uses Docker to run your functions in an Amazon Linux environment that matches Lambda. It can also emulate your application's build environment and API.
+ 2. Lambda Layers:
+On the other hand, Lambda Layers are language agnostic, but do not offer tree shaking, are not cloud agnostic, and cannot perform local unit testing.
 
-To use the AWS SAM CLI, you need the following tools:
+This has led to frustration in developers as they need to trade off certain benefits for better project organization and code reusability.
 
-* AWS SAM CLI - [Install the AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
-* Node.js - [Install Node.js 16](https://nodejs.org/en/), including the npm package management tool.
-* Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community).
+Due to the cons in the existing approach, what developers need is a universal approach that can help them receive all the benefits that current approaches provide while also providing developers with the ability to have tree shaking, remain cloud agnostic, and perform local unit testing.
 
-To build and deploy your application for the first time, run the following in your shell:
+### Bundling serverless code with rollupJS:
+Bundling serverless code with rollupJS offers organization of code, improved navigation, improved readability, code reusability, tree shaking, cloud agnosticism, and the ability to perform local unit testing. It also supports both es modules (by default) and commonjs modules (using the official plugin). 
 
-```bash
-sam build
-sam deploy --guided
-```
+ES modules let you freely and seamlessly combine the most useful individual functions from your favorite libraries. This will eventually be possible natively everywhere, but Rollup lets you do it today. 
 
-The first command will build the source of your application. The second command will package and deploy your application to AWS, with a series of prompts:
+To demonstrate the effectiveness of the approach, we will provide an example with code and directory structure.
 
-* **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
-* **AWS Region**: The AWS region you want to deploy your app to.
-* **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
-* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
-* **Save arguments to samconfig.toml**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
+#### How bundling with rollupJS works?
+In this example will use SAM for Infrastructure as Code and will have two tables (User and Organization) and six lambda functions (get all items for organization, get all items for the user, get organization by ID, get user by ID, put organization, and put user). The code snippets will include npm packages and a rollup config.
 
-The API Gateway endpoint API will be displayed in the outputs when the deployment is complete.
-
-## Use the AWS SAM CLI to build and test locally
-
-Build your application by using the `sam build` command.
-
-```bash
-my-application$ sam build
-```
-
-The AWS SAM CLI installs dependencies that are defined in `package.json`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
-
-Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
-
-Run functions locally and invoke them with the `sam local invoke` command.
-
-```bash
-my-application$ sam local invoke putItemFunction --event events/event-post-item.json
-my-application$ sam local invoke getAllItemsFunction --event events/event-get-all-items.json
-```
-
-The AWS SAM CLI can also emulate your application's API. Use the `sam local start-api` command to run the API locally on port 3000.
-
-```bash
-my-application$ sam local start-api
-my-application$ curl http://localhost:3000/
-```
-
-The AWS SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path.
-
-```yaml
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /
-            Method: GET
-```
-
-## Add a resource to your application
-The application template uses AWS SAM to define application resources. AWS SAM is an extension of AWS CloudFormation with a simpler syntax for configuring common serverless application resources, such as functions, triggers, and APIs. For resources that aren't included in the [AWS SAM specification](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md), you can use the standard [AWS CloudFormation resource types](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html).
-
-Update `template.yaml` to add a dead-letter queue to your application. In the **Resources** section, add a resource named **MyQueue** with the type **AWS::SQS::Queue**. Then add a property to the **AWS::Serverless::Function** resource named **DeadLetterQueue** that targets the queue's Amazon Resource Name (ARN), and a policy that grants the function permission to access the queue.
+We will use the following directory structure for the example application:
 
 ```
-Resources:
-  MyQueue:
-    Type: AWS::SQS::Queue
-  getAllItemsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: src/handlers/get-all-items.getAllItemsHandler
-      Runtime: nodejs16.x
-      DeadLetterQueue:
-        Type: SQS 
-        TargetArn: !GetAtt MyQueue.Arn
-      Policies:
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt MyQueue.QueueName
+/
+    /backend
+        /handlers
+            get-all-organizations.ts
+            get-all-users.ts
+            get-organization-by-id.ts
+            get-user-by-id.ts
+            put-organization.ts
+            put-user.ts
+        /utils
+            db.ts
+    /src
+        /handlers
+            get-all-organizations.js
+            get-all-users.js
+            get-organization-by-id.js
+            get-user-by-id.js
+            put-organization.js
+            put-user.js
+    package.json
+    rollup.config.mjs
 ```
 
-The dead-letter queue is a location for Lambda to send events that could not be processed. It's only used if you invoke your function asynchronously, but it's useful here to show how you can modify your application's resources and function configuration.
+We will use the bundler to transpile the utils/db.js file into the individual functions in the functions directory.
 
-Deploy the updated application.
+This is an example configuration that can be used with rollup:
 
-```bash
-my-application$ sam deploy
+> rollup.config.mjs
+```
+import commonjs from "@rollup/plugin-commonjs";
+import json from "@rollup/plugin-json";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import ts from "@rollup/plugin-typescript";
+
+const plugins = [
+  nodeResolve({
+    resolveOnly: (module) => !module.includes("aws-sdk") // "aws-sdk" is auto installed by amplify. ignore it for now.
+  }),
+  commonjs(),
+  json(),
+  ts({ compilerOptions: { lib: ["es5", "es6", "dom"], target: "es5" } })
+];
+
+const handlersPath = `backend/handlers`;
+const lambdaPath = `src/handlers`;
+
+const format = "cjs";
+
+const config = [
+    {
+        input: `${handlersPath}/get-all-organizations.ts`,
+        output: {
+            file: `${lambdaPath}/get-all-organizations.js`,
+            format
+        },
+        plugins
+    },
+    {
+        input: `${handlersPath}/get-all-users.ts`,
+        output: {
+            file: `${lambdaPath}/get-all-users.js`,
+            format
+        },
+        plugins
+    },
+    {
+        input: `${handlersPath}/get-organization-by-id.ts`,
+        output: {
+            file: `${lambdaPath}/get-organization-by-id.js`,
+            format
+        },
+        plugins
+    },
+    {
+        input: `${handlersPath}/get-user-by-id.ts`,
+        output: {
+            file: `${lambdaPath}/get-user-by-id.js`,
+            format
+        },
+        plugins
+    },
+    {
+        input: `${handlersPath}/put-organization.ts`,
+        output: {
+            file: `${lambdaPath}/put-organization.js`,
+            format
+        },
+        plugins
+    },
+    {
+        input: `${handlersPath}/put-user.ts`,
+        output: {
+            file: `${lambdaPath}/put-user.js`,
+            format
+        },
+        plugins
+    }
+]
+
+export default config;
 ```
 
-Open the [**Applications**](https://console.aws.amazon.com/lambda/home#/applications) page of the Lambda console, and choose your application. When the deployment completes, view the application resources on the **Overview** tab to see the new resource. Then, choose the function to see the updated configuration that specifies the dead-letter queue.
+#### Advantages of the rollupJS approach:
+ 1. Better Project organization, readability, and navigation:
 
-## Fetch, tail, and filter Lambda function logs
+    It is easy to differentiate code that represents handlers from the utils  Also, Typescript code is easier to read than Javascript code. Rollup can transpile typescript to javascript.
 
-To simplify troubleshooting, the AWS SAM CLI has a command called `sam logs`. `sam logs` lets you fetch logs that are generated by your Lambda function from the command line. In addition to printing the logs on the terminal, this command has several nifty features to help you quickly find the bug.
+ 2. Code reusability:
+ 
+    The util functions allow the developer to have reusable code throughout the project. This reduces the burden of copying functions and changing every single copy of it when the need for change arrives.
+    
+    For example, this project has the following util/db.js file:
 
-**NOTE:** This command works for all Lambda functions, not just the ones you deploy using AWS SAM.
-
-```bash
-my-application$ sam logs -n putItemFunction --stack-name sam-app --tail
 ```
+import { DynamoDB } from "aws-sdk";
+import { ItemList, PutItemInput, ScanInput } from "aws-sdk/clients/dynamodb";
+import { AnyObject } from "yup/lib/types";
 
-**NOTE:** This uses the logical name of the function within the stack. This is the correct name to use when searching logs inside an AWS Lambda function within a CloudFormation stack, even if the deployed function name varies due to CloudFormation's unique resource name generation.
+export const dynamoDB = new DynamoDB.DocumentClient({
+    region: process.env.REGION
+});
 
-You can find more information and examples about filtering Lambda function logs in the [AWS SAM CLI documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
 
-## Unit tests
+export async function getItemById(tableName: string, id: string) {
+    const params = {
+        TableName: tableName,
+        Key: {
+            id: id
+        }
+    }
+    const data = await dynamoDB.get(params).promise();
+    return data?.Item;
+}
 
-Tests are defined in the `__tests__` folder in this project. Use `npm` to install the [Jest test framework](https://jestjs.io/) and run unit tests.
+export async function scanItems(tableName: string) {
+    const params: ScanInput = {
+        TableName: tableName
+    }
 
-```bash
-my-application$ npm install
-my-application$ npm run test
+    let result: ItemList = []
+
+    do {
+        const data = await dynamoDB.scan(params).promise();
+        const items = data?.Items || [];
+        result = [...result, ...items];
+        params.ExclusiveStartKey = data?.LastEvaluatedKey;
+    } while (params.ExclusiveStartKey);
+
+    return result;
+}
+
+export async function putItem(tableName: string, item: AnyObject) {
+    const params: PutItemInput = {
+        TableName: tableName,
+        Item: item
+    }
+
+    const result = await dynamoDB.put(params).promise();
+    return result;
+}
 ```
+    
+ 3. Cloud agnosticism:
 
-## Cleanup
+    Since the bundler does not affect any of the IaC (Infrastructure as Code) files, this method can be used for any cloud's serverless projects - currently not supported by SAM or Lambda Layers.
+    It also gives developers the freedom of choice on the IaC framework for their project.
 
-To delete the sample application that you created, use the AWS CLI. Assuming you used your project name for the stack name, you can run the following:
+ 4. Enables Local unit testing:
 
-```bash
-aws cloudformation delete-stack --stack-name rollup
-```
+    Testing can be performed using popular tools like jest or mocha and chai since rollup does not interfere with the test configuration and files. This is not supported by Lambda Layers.
 
-## Resources
+ 5. Allows Tree shaking:
 
-For an introduction to the AWS SAM specification, the AWS SAM CLI, and serverless application concepts, see the [AWS SAM Developer Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html).
+    Tree shaking can be observed when we use popular packages such as lodash. In many cases, only one or two functions are used from a relatively big package.
+    Without tree shaking, the entire package gets imported into the generated files. This leads to unnecessary bloating. As a result, the generated code ends up having 10 times the number of lines than when generated with rollup. (I will add the necessary files for the same and add a GitHub link at the end)
+    Tree shaking, however, is not supported in Lambda Layers.
 
-Next, you can use the AWS Serverless Application Repository to deploy ready-to-use apps that go beyond Hello World samples and learn how authors developed their applications. For more information, see the [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/) and the [AWS Serverless Application Repository Developer Guide](https://docs.aws.amazon.com/serverlessrepo/latest/devguide/what-is-serverlessrepo.html).
+
+For the above-said reasons, rollupJS has the potential to make knowledge transfers easier, thus empowering clients to become owners of the code base.
+
+Please have a look at this [blog](https://www.antstack.com/blog/getting-started-with-leveraging-test-driven-development-for-aws-sam) that talks about test driven development using SAM and this [blog](https://www.antstack.com/blog/nodejs-lambda-bundling-tree-shaking-webpack) that talks about tree shaking in webpack.
+
+The code is documented at the repository which is linked here.
