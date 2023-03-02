@@ -1,0 +1,204 @@
+# This is the SAM template that represents the architecture of your serverless application
+# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-basics.html
+
+# The AWSTemplateFormatVersion identifies the capabilities of the template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  rollup
+
+# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
+Transform:
+- AWS::Serverless-2016-10-31
+
+# Resources declares the AWS resources that you want to include in the stack
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Resources:
+  # Each Lambda function is defined by properties:
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+
+  # This is a Lambda function config associated with the source code: get-all-organizations.js
+  getAllOrganizationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get-all-organizations.handler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Fetches all organizations from organization table in dynamoDB.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the OrganizationTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrganizationTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ORGANIZATION_TABLE: !Ref OrganizationTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /organizations
+            Method: GET
+  # This is a Lambda function config associated with the source code: get-all-users.js
+  getAllUsersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get-all-users.handler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Fetches all users from user table in dynamoDB.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the UserTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          USER_TABLE: !Ref UserTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: GET
+  # This is a Lambda function config associated with the source code: get-organiation-by-id.js
+  getOrganizationByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get-organization-by-id.handler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Fetches organization from organization table in dynamoDB based on ID.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the OrganizationTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrganizationTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ORGANIZATION_TABLE: !Ref OrganizationTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /organization/{id}
+            Method: GET
+
+  # This is a Lambda function config associated with the source code: get-user-by-id.js
+  getUserByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get-user-by-id.handler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Fetches user from user table in dynamoDB based on ID.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the UserTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrganizationTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ORGANIZATION_TABLE: !Ref OrganizationTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /user/{id}
+            Method: GET
+  # Each Lambda function is defined by properties:
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+
+  # This is a Lambda function config associated with the source code: put-organization.js
+  putOrganizationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/put-organization.handler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Puts an organization item to a DynamoDB table.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the OrganizationTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrganizationTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ORGANIZATION_TABLE: !Ref OrganizationTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /organization
+            Method: POST
+  # Each Lambda function is defined by properties:
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+
+  # This is a Lambda function config associated with the source code: put-user.js
+  putUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/put-user.handler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Puts a user item to a DynamoDB table.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the UserTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          USER_TABLE: !Ref UserTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: POST
+  # Simple syntax to create a DynamoDB table with a single attribute primary key, more in
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable
+
+  # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
+  OrganizationTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+  UserTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+
+Outputs:
+  WebEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
