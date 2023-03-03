@@ -76,7 +76,7 @@ import ts from "@rollup/plugin-typescript";
 
 const plugins = [
   nodeResolve({
-    resolveOnly: (module) => !module.includes("aws-sdk") // "aws-sdk" is auto installed by amplify. ignore it for now.
+    resolveOnly: (module) => !module.includes("aws-sdk")
   }),
   commonjs(),
   json(),
@@ -105,30 +105,9 @@ const config = [
         },
         plugins
     },
-    {
-        input: `${handlersPath}/get-organization-by-id.ts`,
-        output: {
-            file: `${lambdaPath}/get-organization-by-id.js`,
-            format
-        },
-        plugins
-    },
-    {
-        input: `${handlersPath}/get-user-by-id.ts`,
-        output: {
-            file: `${lambdaPath}/get-user-by-id.js`,
-            format
-        },
-        plugins
-    },
-    {
-        input: `${handlersPath}/put-organization.ts`,
-        output: {
-            file: `${lambdaPath}/put-organization.js`,
-            format
-        },
-        plugins
-    },
+    .
+    .
+    .
     {
         input: `${handlersPath}/put-user.ts`,
         output: {
@@ -224,4 +203,4 @@ For the above-said reasons, rollupJS has the potential to make knowledge transfe
 
 Please have a look at this [blog](https://www.antstack.com/blog/getting-started-with-leveraging-test-driven-development-for-aws-sam) that talks about test driven development using SAM and this [blog](https://www.antstack.com/blog/nodejs-lambda-bundling-tree-shaking-webpack) that talks about tree shaking in webpack.
 
-The code is documented at the repository which is linked here.
+The code is documented at the repository which is linked [here](https://github.com/alastairmoody-madeye/bundle-with-rollup).

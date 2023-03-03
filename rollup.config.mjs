@@ -5,7 +5,7 @@ import ts from "@rollup/plugin-typescript";
 
 const plugins = [
   nodeResolve({
-    resolveOnly: (module) => !module.includes("aws-sdk") // "aws-sdk" is auto installed by amplify. ignore it for now.
+    resolveOnly: (module) => !module.includes("aws-sdk")
   }),
   commonjs(),
   json(),
